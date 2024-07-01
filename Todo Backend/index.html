@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Todo App</title>
+</head>
+<script>
+    //Task 1: Get todos from backend and show them on UI
+    function showTodos(todos) {
+        let parentElement = document.getElementById("mainArea");
+        for (let i = 0; i < todos.length; i++) {
+            let childElement = document.createElement("div");
+            childElement.setAttribute("id", todos[i].id);
+
+            let grandChild1 = document.createElement("span");
+            grandChild1.innerHTML = todos[i].title;
+
+            let grandChild2 = document.createElement("span");
+            grandChild2.innerHTML = todos[i].description;
+
+            let grandChild3 = document.createElement("button");
+            grandChild3.setAttribute("onclick", "deleteTodo("+todos[i].id+")");
+            grandChild3.innerHTML = "delete";
+
+            let grandChild4 = document.createElement("button");
+            grandChild4.setAttribute("onclick", "updateTodo("+todos[i].id+")");
+            grandChild4.innerHTML = "update";
+
+            childElement.appendChild(grandChild1);
+            childElement.appendChild(grandChild2);
+            childElement.appendChild(grandChild3);
+            childElement.appendChild(grandChild4);
+
+            parentElement.appendChild(childElement);
+        }
+    }
+    function getData() {
+        fetch("http://localhost:3000/todos")
+            .then((response) => {
+                return response.json();
+            })
+            .then((todos) => {
+                // console.log(todos);
+                showTodos(todos);
+            })
+    }
+    getData();
+
+    //Task 2: Get data from client, push into the backend, show the updated todos
+    function onPress() {
+        const title = document.getElementById("title").value;
+        const description = document.getElementById("description").value;
+        const todo = { title, description };
+
+        fetch("http://localhost:3000/todos", {
+            method: "POST",
+            headers: {
+                "content-type": "application/json"
+            },
+            body: JSON.stringify(todo)
+        }).then((response) => {
+            return response.json();
+        }).then((todo) => {
+            //Show new todo in UI
+        })
+    }
+
+    //Task 3: Delete todos from the backend and frontend
+    function deleteTodo(id){
+        fetch("http://localhost:3000/todos/"+id, {
+            method: "DELETE",
+            headers:{
+                "content-type": "application/json"
+            }
+        }).then((response)=>{
+            if(response.status === 200){
+                let todoElement = document.getElementById(id);
+                if(todoElement){
+                    todoElement.remove();
+                }
+            }
+            else{
+                console.log("failed to delete with id: ", id);
+            }
+        })
+    }
+
+    function updateTodo(id){
+        title = window.prompt("Enter the title: ");
+        description = window.prompt("Enter the description: ");
+        const updTodo = {title, description};
+
+        fetch("http://localhost:3000/todos/"+id, {
+            method: "PUT",
+            headers:{
+                "content-type": "application/json"
+            },
+            body: JSON.stringify(updTodo)
+        }).then((response)=>{
+            if(res.status === 200){
+
+            }
+            else{
+                console.log("failed to update with id: ", id);s
+            }
+        })
+    }
+</script>
+
+<body>
+    Todo Title: <input type="text" id="title">
+    <br><br>
+    Todo Description: <input type="text" id="description">
+    <br><br>
+    <button onclick="onPress()">Send Todo</button>
+    <div id="mainArea">
+        <!-- Put all todos dynamically here  -->
+    </div>
+</body>
+
+</html>
